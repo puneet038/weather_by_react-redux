@@ -14,13 +14,16 @@ const Login = () => {
     {
         var checko=false;
         list.map((value)=>
-        {
-            if(value.email===email && value.pass===pass)
+        {if(value.email==="" || value.pass==="")
+            {
+             checko=false;  
+            }
+            else if(value.email===email && value.pass===pass)
             {
                checko=true;
             }
             else{
-
+               checko=false; 
             }
         })
         if(checko===true)
