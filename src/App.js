@@ -2,22 +2,25 @@ import React,{useState} from "react";
 import './App.css';
 import Select from 'react-select';
 import {useHistory} from 'react-router-dom';
+import Loader from './Loading';
 import background from './img/weather.jpg'
 import citydata from './City';
 
 function App() {
   const [show,setshow]=useState(false);
-  const [city,setcity]=useState('');
+  const [city,setcity]=useState('List of city');
   const[des,setdes]=useState('');
   const[temp,settemp]=useState('');
  const[fdata,setfdata]=useState([]);
  const history =useHistory();
+ const [loader, setLoader] =useState(false);
  
   const showcity=async(e)=>{
     setcity(e.label);
-    
+    setLoader(true);
     const reso=await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${e.label}&appid=3fbb2b31fd3e77c536be64abc677a4d1`);
     const data=await reso.json();
+    setTimeout(() => {setLoader(false)},1000)
     if(reso.status==404){
 
     }
@@ -49,26 +52,29 @@ function App() {
     }
   }
   return (
-    
     <div style={{ backgroundImage: `url(${background})`, backgroundSize:"100% 100%" }}>
     <button className="logout" onClick={()=>history.push("/login")}>Logout <i class="fas fa-sign-out-alt"></i></button>
     <div style={{display:'flex'}}>
 
     <div className="main_div" style={{position:'relative'}}>
+      
           <div>
             <h1>Select City</h1>
-              <Select  options={citydata} className="select" type="text" placeholder="List of cities" value={city} onChange={showcity} />
+              <Select  options={citydata} className="select" type="text" placeholder={city} value={city} onChange={showcity}  />
           </div>
           <div style={{display:'flex'}}>
+            {  loader?<Loader/>:
+            <React.Fragment>
              <div className="card">
                <h3 className="text">Current Weather Data</h3>
-                <p>{city}</p>
+                <p>{city==='List of city'?" ":city}</p>
                 <p>{des}</p>
                 <p>{temp}</p>
               </div>
               <div className="card" id="forecast">
+              <h3 >5-Day Forecast</h3>
                 {
-                  
+                 
                   fdata.map((value,index)=>
                   {
                     if(index%8==0)
@@ -87,9 +93,12 @@ function App() {
                       )
                     }
                   })
+                  
                 }
 
               </div>
+              </React.Fragment>
+             }
            </div>
            <button className="aboutbtn" onClick={()=>setshow(!show)}>About Us</button>
       </div>
